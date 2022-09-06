@@ -1,1 +1,1 @@
-I am coding
+Create a script that creates an alias
