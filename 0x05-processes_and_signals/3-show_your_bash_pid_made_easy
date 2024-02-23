@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# Use pgrep to find processes with the name containing "bash"
+pgrep -l bash
