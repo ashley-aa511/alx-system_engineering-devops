@@ -1,6 +1,3 @@
 #!/usr/bin/env bash
 # Display header
-echo "PID   PPID   UID   CMD"
-
-# Use ps command to display processes with user-oriented format, including all users and process hierarchy
-ps -eo pid,ppid,uid,cmd --forest
+ps -a -x -u -f
