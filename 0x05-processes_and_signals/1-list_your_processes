@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
-# Display header
-ps -a -x -u -f
+# Lists all the process in the system
+
+ps -auxf
