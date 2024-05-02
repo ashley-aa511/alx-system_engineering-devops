@@ -1,35 +1,20 @@
 #!/usr/bin/env bash
+# Bash script displays DNS records: record type, IP, subdomains
 
-# Function to audit DNS records
-audit_dns() {
-    domain=$1
-        subdomain=$2
+print_rec ()
+{
+    printf "The subdomain %s is a " "$2"
+    dig "$2.$1" | grep -A1 'ANSWER SECTION:' | awk -F' ' '{ printf $4 }'
+    printf " record and points to "
+    dig "$2.$1" | grep -A1 'ANSWER SECTION:' | awk -F' ' '{ printf $5 }'
+    echo ""
+}
 
-    if [ -z "$subdomain" ]; then
-            # No specific subdomain provided, audit default subdomains
-	            subdomains=("www" "lb-01" "web-01" "web-02")
-		        else
-			        # Audit the specified subdomain
-				        subdomains=("$subdomain")
-					    fi
-
-    for sub in "${subdomains[@]}"; do
-            record_type=$(dig +short -t CNAME "$sub.$domain" | awk '{ print length($0) ? "CNAME" : "A" }')
-	            destination=$(dig +short "$sub.$domain" | head -n1)
-
-        echo "The subdomain $sub.$domain is a $record_type record and points to $destination"
-	    done
-	    }
-
-# Check for correct number of arguments
-if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
-    echo "Usage: $0 <domain> [subdomain]"
-        exit 1
-	fi
-
-# Capture domain and subdomain arguments
-domain=$1
-subdomain=$2
-
-# Audit DNS records based on arguments
-audit_dns "$domain" "$subdomain"
+if [ -z "$2" ]; then
+    for subs in "www" "lb-01" "web-01" "web-02"
+    do
+	print_rec "$1" "$subs"
+    done
+else
+    print_rec "$1" "$2"
+    fi
