@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Install Nginx if not already installed
+apt update
+apt install -y nginx
+
+# Restart Nginx service
+service nginx restart
+
+# Check Nginx status
+service nginx status
