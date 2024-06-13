@@ -3,19 +3,27 @@
 
 # Install HAproxy on a server
 apt-get -y update
-apt-get -y install haproxy=1.6.\*
+apt-get -y install haproxy
 
-# Configure haproxy configuration file to distribute requests using a roundrobin algorithm
-echo '
-frontend sammykingx.tech
-        bind 0:80
-	        default_backend web_servers
-
-backend web_servers
+# edit config file
+server_config=\
+	     "
+frontend  ashley_frontend
+        bind *:80
+        mode http
+        default_backend ashley_backend
+backend ashley_backend
         balance roundrobin
-	        server 64820-web-01 100.26.152.157:80
-		        server 64820-web-02 52.86.102.6:80
-			' >> /etc/haproxy/haproxy.cfg
+        server 97293-web-01 100.25.26.23:80 check
+        server 97293-web-02 18.234.253.202:80 check
+"
+echo "$server_config" | sudo tee -a /etc/haproxy/haproxy.cfg
 
-# Restart HAproxy service
-service haproxy restart
+# enable haproxy to be started by init script
+echo "ENABLED=1" | sudo tee -a /etc/default/haproxy
+
+# Testing the HAproxy configuration file
+sudo haproxy -c -f /etc/haproxy/haproxy.cfg
+
+# Restart the Nginx service
+sudo service haproxy restart
