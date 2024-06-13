@@ -1,2 +1,7 @@
 #!/usr/bin/env bash
-ssh -i ~/.ssh/school ubuntu@100.25.202.14
+
+USER="ubuntu"
+HOST="54.197.21.102"
+KEY="~/.ssh/school"
+
+ssh -i $KEY $USER@$HOST
