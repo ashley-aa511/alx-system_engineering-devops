@@ -1,0 +1,55 @@
+class nginx::configure {
+  # Ensure Nginx package is installed
+  package { 'nginx':
+    ensure => installed,
+  }
+
+  # Manage Nginx service
+  service { 'nginx':
+    ensure    => running,
+    enable    => true,
+    subscribe => File['/etc/nginx/nginx.conf'],
+  }
+
+  # Define Nginx configuration
+  file { '/etc/nginx/nginx.conf':
+    ensure  => file,
+    content => template('nginx/nginx.conf.erb'),
+    notify  => Service['nginx'],
+  }
+
+  # Set limits for open files
+  file { '/etc/security/limits.conf':
+    ensure  => file,
+    content => <<-EOT
+    * soft nofile 65536
+    * hard nofile 65536
+    EOT
+  }
+
+  # Update sysctl settings
+  exec { 'sysctl-settings':
+    command => 'sysctl -w net.core.somaxconn=65535',
+    path    => ['/bin', '/sbin', '/usr/bin', '/usr/sbin'],
+    notify  => Service['nginx'],
+  }
+
+  exec { 'reload-sysctl':
+    command => 'sysctl -p',
+    path    => ['/bin', '/sbin', '/usr/bin', '/usr/sbin'],
+    refreshonly => true,
+  }
+}
+
+# Nginx template configuration (nginx.conf.erb)
+template { 'nginx/nginx.conf.erb':
+  source => 'nginx/nginx.conf.erb',
+  mode   => '0644',
+}
+
+# Nginx configuration file content
+file { '/etc/nginx/nginx.conf':
+  content => template('nginx/nginx.conf.erb'),
+}
+
+# Ensure correct configuration values in the Nginx template
