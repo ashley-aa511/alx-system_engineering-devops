@@ -1,45 +1,14 @@
-class nginx::configure {
-  # Ensure Nginx package is installed
-  package { 'nginx':
-    ensure => installed,
-  }
+# This manuscript increases the amount of traffic an Nginx server can handle
 
-  # Manage Nginx service
-  service { 'nginx':
-    ensure    => running,
-    enable    => true,
-    subscribe => File['/etc/nginx/nginx.conf'],
-  }
-
-  # Define Nginx configuration
-  file { '/etc/nginx/nginx.conf':
-    ensure  => file,
-    content => template('nginx/nginx.conf.erb'),
-    notify  => Service['nginx'],
-  }
-
-  # Set limits for open files
-  file { '/etc/security/limits.conf':
-    ensure  => file,
-    content => @(END)
-      * soft nofile 65536
-      * hard nofile 65536
-      END
-  }
-
-  # Update sysctl settings
-  exec { 'sysctl-settings':
-    command => 'sysctl -w net.core.somaxconn=65535',
-    path    => ['/bin', '/sbin', '/usr/bin', '/usr/sbin'],
-    notify  => Service['nginx'],
-  }
-
-  exec { 'reload-sysctl':
-    command     => 'sysctl -p',
-    path        => ['/bin', '/sbin', '/usr/bin', '/usr/sbin'],
-    refreshonly => true,
-  }
+# Increase the ULIMIT of the default file
+file { 'fix-for-nginx':
+  ensure  => 'file',
+  path    => '/etc/default/nginx',
+  content => inline_template('<%= File.read("/etc/default/nginx").gsub(/15/, "4096") %>'),
 }
 
-# Apply the configuration
-include nginx::configure
+# Restart Nginx
+-> exec { 'nginx-restart':
+  command => 'nginx restart',
+  path    => '/etc/init.d/',
+}
