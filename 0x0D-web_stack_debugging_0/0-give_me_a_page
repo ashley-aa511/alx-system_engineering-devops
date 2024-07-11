@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Update the package lists for upgrades and new package installations
+sudo apt-get update
+# Install Apache web server
+sudo apt-get install apache2 -y
+# Start the Apache web server service
+sudo systemctl start apache2
+# Enable Apache service to start on boot
+sudo systemctl enable apache2
+# Create or overwrite the default index file with "Hello Holberton"
+echo "Hello Holberton" | sudo tee /var/www/html/index.html
+# Check the status of the Apache service
+sudo systemctl status apache2
+# Allow Apache through the firewall
+sudo ufw allow 'Apache Full'
+# Tail the Apache error log for troubleshooting
+sudo tail -f /var/log/apache2/error.log
+# Check if Apache is serving the "Hello Holberton" page
+curl http://localhost/
+
+
