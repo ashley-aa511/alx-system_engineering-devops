@@ -1,2 +1,3 @@
 #!/bin/bash
-pwd
+# Print the absolute path name of the current working directory
+echo "0x00-shell_basics: $(pwd)"
